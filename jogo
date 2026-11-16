@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Caça às Estrelas</title>
+	<style>
+		* { box-sizing: border-box; }
+		body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #10152b; color: #fff; font: 16px system-ui, sans-serif; }
+		main { width: min(92vw, 520px); text-align: center; }
+		h1 { margin: 0 0 8px; color: #ffe66d; }
+		p { margin: 8px 0 16px; color: #cbd2f5; }
+		#arena { position: relative; height: 330px; overflow: hidden; border: 2px solid #5965a5; border-radius: 18px; background: radial-gradient(circle at center, #202952, #141a35); }
+		#alvo { position: absolute; display: none; width: 52px; height: 52px; border: 0; border-radius: 50%; background: #ffe66d; font-size: 30px; cursor: pointer; box-shadow: 0 0 22px #ffe66d88; }
+		#iniciar { margin: 16px 6px; padding: 11px 22px; border: 0; border-radius: 10px; background: #8b7bff; color: white; font: inherit; font-weight: 700; cursor: pointer; }
+		#iniciar:hover { background: #a398ff; }
+		#iniciar:disabled { opacity: .6; cursor: default; }
+		.placar { display: flex; justify-content: center; gap: 28px; font-size: 18px; }
+		.placar strong { color: #ffe66d; }
+	</style>
+</head>
+<body>
+	<main>
+		<h1>✨ Caça às Estrelas</h1>
+		<p>Clique em tantas estrelas quanto conseguir em 30 segundos!</p>
+		<div class="placar"><span>Pontos: <strong id="pontos">0</strong></span><span>Tempo: <strong id="tempo">30</strong>s</span></div>
+		<div id="arena" aria-label="Área do jogo"><button id="alvo" aria-label="Estrela">⭐</button></div>
+		<button id="iniciar">Começar jogo</button>
+		<p id="mensagem" aria-live="polite">Prepare-se para jogar!</p>
+	</main>
+	<script>
+		const arena = document.querySelector('#arena');
+		const alvo = document.querySelector('#alvo');
+		const pontosEl = document.querySelector('#pontos');
+		const tempoEl = document.querySelector('#tempo');
+		const iniciar = document.querySelector('#iniciar');
+		const mensagem = document.querySelector('#mensagem');
+		let pontos = 0;
+		let tempo = 30;
+		let intervalo;
+
+		function moverAlvo() {
+			const maxX = arena.clientWidth - alvo.offsetWidth;
+			const maxY = arena.clientHeight - alvo.offsetHeight;
+			alvo.style.left = Math.random() * maxX + 'px';
+			alvo.style.top = Math.random() * maxY + 'px';
+		}
+
+		iniciar.addEventListener('click', () => {
+			clearInterval(intervalo);
+			pontos = 0;
+			tempo = 30;
+			pontosEl.textContent = pontos;
+			tempoEl.textContent = tempo;
+			mensagem.textContent = 'Vai!';
+			iniciar.disabled = true;
+			alvo.style.display = 'block';
+			moverAlvo();
+			intervalo = setInterval(() => {
+				tempoEl.textContent = --tempo;
+				if (tempo <= 0) {
+					clearInterval(intervalo);
+					alvo.style.display = 'none';
+					iniciar.disabled = false;
+					mensagem.textContent = `Fim de jogo! Você fez ${pontos} ponto${pontos === 1 ? '' : 's'}.`;
+				}
+			}, 1000);
+		});
+
+		alvo.addEventListener('click', () => {
+			pontosEl.textContent = ++pontos;
+			moverAlvo();
+		});
+	</script>
+</body>
+</html>
